@@ -1,6 +1,6 @@
 "use client"
 
-import { useRef, useState, useSyncExternalStore } from "react"
+import { useEffect, useRef, useState, useSyncExternalStore } from "react"
 import { Trash2Icon } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
@@ -26,6 +26,21 @@ export function TodoApp() {
     useTodos()
   const [draft, setDraft] = useState("")
   const [filter, setFilter] = useState<Filter>("all")
+  const [notice, setNotice] = useState<string | null>(null)
+  const noticeTimer = useRef<ReturnType<typeof setTimeout> | undefined>(
+    undefined
+  )
+
+  useEffect(() => () => clearTimeout(noticeTimer.current), [])
+
+  // 미완료 → 완료로 바뀔 때만 칭찬 알림을 잠깐 보여 준다
+  const handleToggle = (todo: Todo) => {
+    toggleTodo(todo.id)
+    if (todo.completed) return
+    setNotice("잘했어요! 🎉")
+    clearTimeout(noticeTimer.current)
+    noticeTimer.current = setTimeout(() => setNotice(null), 2000)
+  }
 
   const completedCount = todos.filter((todo) => todo.completed).length
 
@@ -92,7 +107,7 @@ export function TodoApp() {
             <TodoItem
               key={todo.id}
               todo={todo}
-              onToggle={() => toggleTodo(todo.id)}
+              onToggle={() => handleToggle(todo)}
               onDelete={() => deleteTodo(todo.id)}
               onEdit={(text) => editTodo(todo.id, text)}
             />
@@ -111,6 +126,17 @@ export function TodoApp() {
           </Button>
         </div>
       )}
+      <div
+        role="status"
+        aria-live="polite"
+        className="pointer-events-none fixed inset-x-0 bottom-6 flex justify-center"
+      >
+        {notice && (
+          <p className="rounded-full bg-foreground px-4 py-2 text-sm text-background shadow-lg">
+            {notice}
+          </p>
+        )}
+      </div>
     </div>
   )
 }
