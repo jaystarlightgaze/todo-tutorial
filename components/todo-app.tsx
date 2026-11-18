@@ -96,13 +96,13 @@ export function TodoApp() {
         </TabsList>
       </Tabs>
       {visibleTodos.length === 0 ? (
-        <p className="py-6 text-center text-sm text-muted-foreground">
+        <p className="rounded-xl border border-dashed py-10 text-center text-sm text-muted-foreground">
           {todos.length === 0
             ? "할 일이 없습니다"
             : "해당하는 할 일이 없습니다"}
         </p>
       ) : (
-        <ul className="flex flex-col gap-1">
+        <ul className="flex flex-col gap-2">
           {visibleTodos.map((todo) => (
             <TodoItem
               key={todo.id}
@@ -114,16 +114,21 @@ export function TodoApp() {
           ))}
         </ul>
       )}
-      {completedCount > 0 && (
-        <div className="flex justify-end">
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={clearCompleted}
-            className="text-muted-foreground hover:text-destructive"
-          >
-            완료한 일 지우기 ({completedCount})
-          </Button>
+      {todos.length > 0 && (
+        <div className="flex items-center justify-between gap-2">
+          <p className="text-sm text-muted-foreground">
+            {todos.length - completedCount}개 남음
+          </p>
+          {completedCount > 0 && (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={clearCompleted}
+              className="text-muted-foreground hover:text-destructive"
+            >
+              완료한 일 지우기 ({completedCount})
+            </Button>
+          )}
         </div>
       )}
       <div
@@ -183,7 +188,12 @@ function TodoItem({
   }
 
   return (
-    <li className="group flex min-h-11 items-center gap-3 rounded-lg px-2 hover:bg-muted/50">
+    <li
+      className={cn(
+        "group flex min-h-12 items-center gap-3 rounded-xl border bg-card px-3 shadow-xs transition-colors hover:bg-muted/50",
+        todo.completed && "bg-muted/30"
+      )}
+    >
       <Checkbox
         checked={todo.completed}
         onCheckedChange={onToggle}
@@ -215,7 +225,7 @@ function TodoItem({
         size="icon-sm"
         onClick={onDelete}
         aria-label={`${todo.text} 삭제`}
-        className="text-muted-foreground hover:text-destructive"
+        className="text-muted-foreground opacity-60 transition-opacity group-hover:opacity-100 hover:text-destructive focus-visible:opacity-100"
       >
         <Trash2Icon />
       </Button>
